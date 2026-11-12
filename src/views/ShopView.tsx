@@ -45,7 +45,7 @@ export function ShopView() {
 
   return (
     <div className="wrap">
-      <div className="shop-head">
+      <div className="shop-head" data-reveal>
         <div><h1 className="display d1">{t('shopTitle')}</h1><p>{t('shopSub')}</p></div>
         <span className="label muted">{t('pieces')(list.length)}</span>
       </div>

@@ -5,6 +5,8 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { BagSheet } from '@/components/BagSheet';
 import { Toast } from '@/components/Toast';
+import { Intro } from '@/components/Intro';
+import { ScrollFx } from '@/components/ScrollFx';
 import './globals.css';
 
 const archivo = Archivo({ subsets: ['latin'], axes: ['wdth'], variable: '--font-archivo', display: 'swap' });
@@ -29,8 +31,10 @@ const brandVars = {
 
 export const viewport: Viewport = { width: 'device-width', initialScale: 1, viewportFit: 'cover' };
 
-// Apply the saved theme / language before first paint to avoid a flash.
-const bootScript = `try{var t=JSON.parse(localStorage.getItem('fs-theme')||'"system"');if(t!=='system')document.documentElement.setAttribute('data-theme',t);var l=JSON.parse(localStorage.getItem('fs-lang')||'"en"');document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr'}catch(e){}`;
+// Apply the saved theme / language before first paint to avoid a flash,
+// and decide whether the brand intro plays (once per session, never with reduced motion).
+const bootScript = `try{var t=JSON.parse(localStorage.getItem('fs-theme')||'"system"');if(t!=='system')document.documentElement.setAttribute('data-theme',t);var l=JSON.parse(localStorage.getItem('fs-lang')||'"en"');document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr'}catch(e){}
+try{var h=document.documentElement,seen=sessionStorage.getItem('fs-intro'),rm=matchMedia('(prefers-reduced-motion: reduce)').matches;if(!rm)h.classList.add('fx');if(seen||rm)h.classList.add('intro-skip');else{h.classList.add('intro-play');setTimeout(function(){h.classList.remove('intro-play','intro-fast')},7000)}}catch(e){document.documentElement.classList.add('intro-skip')}`;
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
@@ -39,12 +43,14 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <script dangerouslySetInnerHTML={{ __html: bootScript }} />
       </head>
       <body>
+        <Intro />
         <StoreProvider>
           <Header />
           <main id="app">{children}</main>
           <Footer />
           <BagSheet />
           <Toast />
+          <ScrollFx />
         </StoreProvider>
       </body>
     </html>

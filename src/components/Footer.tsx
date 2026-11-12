@@ -19,7 +19,7 @@ export function Footer() {
         <ul className="trust">
           {t('svc').map((s, i) => { const I = svcIcons[i]; return <li key={s}><I /><span>{s}</span></li>; })}
         </ul>
-        <div className="fgrid">
+        <div className="fgrid" data-reveal>
           <div className="fbrand">
             <Logotype />
             <p className="label worn">{t('worn')}</p>

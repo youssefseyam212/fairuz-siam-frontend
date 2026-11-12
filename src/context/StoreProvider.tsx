@@ -1,5 +1,6 @@
 'use client';
 
+import { scrollToEl } from '@/lib/scroll';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { byId, type BagLine, type CollectionKey, type Lang, type Localized, type Metal } from '@/lib/data';
@@ -171,7 +172,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     else if (k === 'home') { router.push('/'); }
     else if (k === 'sec') {
       if (pathname === '/') {
-        document.getElementById(v)?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+        scrollToEl(document.getElementById(v));
       } else { pendingSection.current = v; router.push('/'); }
     }
     else if (k === 'p') { router.push('/product/' + v); }

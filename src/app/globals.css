@@ -484,3 +484,131 @@ legend{padding:0;margin-bottom:10px;display:flex;gap:8px}
 
 /* mobile menu theme pill icon */
 .mrow .pill svg{width:18px;height:18px}
+
+/* ───────── Brand intro (once per session) ─────────
+   1. navy stage with drifting fayrouz light (brand cover)
+   2. monogram builds letter by letter in palette colors, then unifies (brand "Icon design")
+   3. bilingual logotype opens from the center + tagline settles
+   4. an arched doorway (palette doors) opens from below and reveals the site */
+.fs-intro{
+  --arch:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 130'%3E%3Cpath d='M0 130V58C0 30 22 12 50 0C78 12 100 30 100 58V130Z'/%3E%3C/svg%3E");
+  --out:cubic-bezier(.16,1,.3,1); --door:cubic-bezier(.6,.05,.25,1);
+  position:fixed;inset:0;z-index:1000;display:grid;place-items:center;overflow:hidden;
+  background:#1a1e3c;color:var(--cream);cursor:pointer;
+  -webkit-mask:var(--arch) 50% 100%/0 0 no-repeat,linear-gradient(#000 0 0) 0 0/100% 100%;-webkit-mask-composite:xor;
+  mask:var(--arch) 50% 100%/0 0 no-repeat,linear-gradient(#000 0 0) 0 0/100% 100%;mask-composite:exclude;
+  animation:fsOpen 1.3s var(--door) 2.9s forwards;
+}
+html:not(.intro-play) .fs-intro{display:none}
+.fs-intro::before{content:"";position:absolute;inset:-25%;pointer-events:none;opacity:0;
+  background:
+    radial-gradient(26% 20% at 28% 68%,rgba(18,189,193,.34),transparent 70%),
+    radial-gradient(20% 16% at 74% 30%,rgba(85,191,155,.26),transparent 70%),
+    radial-gradient(16% 13% at 62% 82%,rgba(18,189,193,.2),transparent 70%),
+    radial-gradient(14% 12% at 20% 24%,rgba(225,128,181,.12),transparent 70%);
+  animation:fsFade 1.4s ease .05s forwards,fsDrift 8s ease-in-out infinite alternate}
+.fs-intro__in{position:relative;display:grid;justify-items:center;gap:26px;animation:fsOut .55s ease 2.75s forwards}
+.fs-intro__mono{position:relative;width:clamp(104px,26vw,156px);aspect-ratio:500/474}
+.fs-intro__piece{position:absolute;inset:0;background:var(--c);opacity:0;
+  -webkit-mask:var(--icon) center/contain no-repeat;mask:var(--icon) center/contain no-repeat;
+  animation:fsPiece .85s var(--out) var(--d) forwards,fsUnify .7s ease 1.65s forwards}
+.fs-intro__whole{position:absolute;inset:0;background:var(--cream);opacity:0;
+  -webkit-mask:var(--icon) center/contain no-repeat;mask:var(--icon) center/contain no-repeat;animation:fsFade .45s ease 2.05s forwards}
+.p-f{clip-path:inset(0 72% 58% 0)} .p-a{clip-path:inset(0 38% 58% 28%)} .p-i{clip-path:inset(0 0 58% 62%)}
+.p-r{clip-path:inset(42% 64% 0 0)} .p-u{clip-path:inset(42% 38% 0 36%)} .p-z{clip-path:inset(42% 0 0 62%)}
+.fs-intro__logo{display:block;width:clamp(190px,52vw,270px);aspect-ratio:1000/232;background:var(--cream);
+  -webkit-mask:var(--logo) center/contain no-repeat;mask:var(--logo) center/contain no-repeat;
+  clip-path:inset(0 50% 0 50%);animation:fsWipe 1s var(--out) 1.8s forwards}
+.fs-intro__tag{font-family:var(--f-label);font-stretch:125%;font-weight:600;font-size:.62rem;text-transform:uppercase;
+  color:var(--pink);opacity:0;letter-spacing:.7em;animation:fsTrack 1.1s var(--out) 2.05s forwards}
+.fs-intro__tags{display:grid;justify-items:center;margin-top:-6px}
+.fs-intro__tags>*{grid-area:1/1}
+.fs-intro__tag--ar{visibility:hidden;font-family:var(--f-ar);font-size:.85rem;letter-spacing:0;text-transform:none;animation-name:fsFadeUp}
+html[lang=ar] .fs-intro__tag--en{visibility:hidden}
+html[lang=ar] .fs-intro__tag--ar{visibility:visible}
+.fs-intro__bar{position:absolute;left:50%;bottom:calc(44px + env(safe-area-inset-bottom,0px));translate:-50% 0;
+  display:flex;gap:5px;width:min(210px,50vw);animation:fsOut .55s ease 2.75s forwards}
+.fs-intro__bar span{flex:1;height:2px;border-radius:2px;background:var(--c);transform:scaleX(0);transform-origin:left;
+  animation:fsBar .5s var(--out) var(--d) forwards}
+[dir=rtl] .fs-intro__bar span{transform-origin:right}
+
+/* the site settles in behind the opening door */
+html.intro-play{overflow:hidden}
+html.intro-play .hdr{animation:fsHdr 1s var(--out) 3.35s both}
+html.intro-play #app{transform-origin:50% 40vh;animation:fsSite 1.3s var(--out) 2.95s both}
+
+/* skip on click / key / wheel: open the door now */
+.fs-intro.is-skip{animation:fsOpenFast .85s var(--door) forwards}
+.fs-intro.is-skip .fs-intro__in,.fs-intro.is-skip .fs-intro__bar{animation:fsOutFast .3s ease forwards}
+html.intro-fast .hdr{animation:fsHdrFast .9s var(--out) .3s both}
+html.intro-fast #app{animation:fsSiteFast 1s var(--out) both}
+
+@keyframes fsOpen{to{-webkit-mask-size:200vmax 260vmax,100% 100%;mask-size:200vmax 260vmax,100% 100%;visibility:hidden}}
+@keyframes fsOpenFast{to{-webkit-mask-size:200vmax 260vmax,100% 100%;mask-size:200vmax 260vmax,100% 100%;visibility:hidden}}
+@keyframes fsFade{to{opacity:1}}
+@keyframes fsDrift{to{transform:translate(4vw,-3vw) scale(1.12) rotate(4deg)}}
+@keyframes fsPiece{from{opacity:0;transform:translateY(14%) scale(.86);filter:blur(10px)}to{opacity:1;transform:none;filter:none}}
+@keyframes fsUnify{to{background:var(--cream)}}
+@keyframes fsWipe{from{transform:translateY(6px)}to{clip-path:inset(0 0 0 0);transform:none}}
+@keyframes fsTrack{to{opacity:.9;letter-spacing:.32em}}
+@keyframes fsFadeUp{from{transform:translateY(6px)}to{opacity:.9;transform:none}}
+@keyframes fsBar{to{transform:scaleX(1)}}
+@keyframes fsOut{to{opacity:0;transform:scale(.94);filter:blur(6px)}}
+@keyframes fsOutFast{to{opacity:0;transform:scale(.94);filter:blur(6px)}}
+@keyframes fsSite{from{transform:scale(1.06);filter:saturate(.4) brightness(.9)}}
+@keyframes fsSiteFast{from{transform:scale(1.06);filter:saturate(.4) brightness(.9)}}
+@keyframes fsHdr{from{transform:translateY(-100%);opacity:0}}
+@keyframes fsHdrFast{from{transform:translateY(-100%);opacity:0}}
+@media (prefers-reduced-motion:reduce){.fs-intro{display:none}}
+
+/* ───────── Scroll motion (driven by components/ScrollFx.tsx) ─────────
+   --p = scene progress 0→1, --e = how far its top has entered the viewport 0→1 */
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+.lenis.lenis-smooth [data-lenis-prevent]{overscroll-behavior:contain}
+.lenis.lenis-stopped{overflow:clip}
+:root{--ease-apple:cubic-bezier(.16,1,.3,1)}
+
+/* reveal: rise + un-blur + fade, staggered by --i. Uses `translate` (not `transform`) so .press still works */
+html.fx [data-reveal]{opacity:0;translate:0 40px;filter:blur(10px);
+  transition:opacity .9s var(--ease-apple),translate 1.25s var(--ease-apple),filter .9s var(--ease-apple),transform .18s var(--ease),background-color .2s,color .2s;
+  transition-delay:calc(var(--i,0) * 90ms),calc(var(--i,0) * 90ms),calc(var(--i,0) * 90ms),0s,0s,0s}
+html.fx [data-reveal].is-in{opacity:1;translate:none;filter:none}
+html.fx [data-reveal].is-in:active{transition-delay:0s}
+
+/* pinned manifesto: words light up as you scroll */
+.mf{position:relative;height:290vh}
+.mf-stage{position:sticky;top:0;height:100vh;height:100svh;display:grid;place-items:center;overflow:hidden;background:#161a36;color:var(--cream);isolation:isolate}
+.mf-stage::before{content:"";position:absolute;inset:-20%;z-index:-1;pointer-events:none;
+  background:radial-gradient(30% 26% at 22% 72%,rgba(18,189,193,.22),transparent 70%),radial-gradient(24% 22% at 80% 26%,rgba(225,128,181,.14),transparent 70%)}
+.mf-mono{position:absolute;z-index:-1;width:min(86vw,86vh);left:50%;top:50%;translate:-50% -50%;color:rgba(18,189,193,.07)}
+.mf-in{position:relative;text-align:center}
+.mf-eb{display:block;color:var(--fayrouz);margin-bottom:clamp(20px,3vw,32px)}
+.mf-txt{margin:0 auto;max-width:16em;font-family:var(--f-display);font-size:clamp(2.1rem,5.4vw,4.8rem);line-height:1.04;letter-spacing:-.022em;text-wrap:balance}
+.mf-txt span{opacity:clamp(.14,calc((var(--p,0) * 1.18 - .04) * var(--n) - var(--i)),1);transition:opacity .25s linear}
+[dir=rtl] .mf-txt{font-family:var(--f-ar);font-weight:500;letter-spacing:0;line-height:1.45;font-size:clamp(1.8rem,4.4vw,3.8rem)}
+html:not(.fx) .mf{height:auto}
+html:not(.fx) .mf-stage{position:relative;height:auto;padding-block:clamp(80px,14vw,160px)}
+html:not(.fx) .mf-txt span{opacity:1}
+
+@media (prefers-reduced-motion:no-preference){
+  /* hero recedes: shrinks, rounds its corners, content drifts apart */
+  .hs[data-scene]{transform-origin:50% 0;scale:calc(1 - var(--p,0) * .07);clip-path:inset(0 calc(var(--p,0) * 3px) round calc(var(--p,0) * 44px));will-change:scale}
+  .hs .slide .in>div:first-child{translate:0 calc(var(--p,0) * -110px);opacity:calc(1 - var(--p,0) * 1.7)}
+  .hs .vis{translate:0 calc(var(--p,0) * 80px);scale:calc(1 - var(--p,0) * .12)}
+  .hs .hs-ui{opacity:calc(1 - var(--p,0) * 3)}
+
+  /* manifesto: stage opens from an inset card to full bleed, monogram turns slowly */
+  .mf-stage{clip-path:inset(calc((1 - var(--e,1)) * 9vh) calc((1 - var(--e,1)) * 6vw) round calc((1 - var(--e,1)) * 48px))}
+  .mf-mono{scale:calc(.8 + var(--p,0) * .35);rotate:calc(var(--p,0) * 10deg)}
+  .mf-in{translate:0 calc((.5 - var(--p,0)) * 40px)}
+
+  /* parallax: art moves at a different speed than the page */
+  .tiles3 .t3 svg{translate:0 calc((.5 - var(--p,.5)) * 56px)}
+  .ctiles .ctile svg.g{translate:0 calc((.5 - var(--p,.5)) * 70px)}
+  .split .art[data-scene]{scale:calc(.84 + .16 * min(1,var(--e,1) * 1.35))}
+  .art-story .mono.big{rotate:calc((var(--p,.5) - .5) * 26deg);scale:calc(1 + var(--p,.5) * .18)}
+  .art-story .sq{translate:0 calc((.5 - var(--p,.5)) * 90px)}
+  .art-gift svg,.art-gift .mono{translate:0 calc((.5 - var(--p,.5)) * 80px)}
+  .art-gift svg{rotate:calc((var(--p,.5) - .5) * -8deg)}
+}

@@ -11,6 +11,8 @@ const fresh = PRODUCTS.filter((p) => p.isNew);
 const sig = [...fresh, ...PRODUCTS.filter((p) => !p.isNew)];
 const SLIDE_ACTS = ['sec:collections', 'col:fayrouz', 'new'];
 const UI_TONE = ['#ffffff', 'var(--pink)', 'var(--purple)'];
+/** stagger index for data-reveal children */
+const iv = (i: number) => ({ '--i': i }) as React.CSSProperties;
 const CATS: [PieceType, string, string][] = [['ring', 'dome-ring', 'k-fayrouz'], ['necklace', 'jali-pendant', 'k-mughal'], ['earrings', 'ember-drops', 'k-nile']];
 
 const VISUALS: ReactNode[] = [
@@ -106,7 +108,7 @@ function HeroSlider() {
   };
 
   return (
-    <section className="hs" ref={hsRef} aria-roledescription="carousel" aria-label={t('heroTitle')} tabIndex={0}
+    <section className="hs" data-scene="exit" ref={hsRef} aria-roledescription="carousel" aria-label={t('heroTitle')} tabIndex={0}
       onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerEnd} onPointerCancel={onPointerEnd}
       onClickCapture={(e) => { if (dragged.current) { e.preventDefault(); e.stopPropagation(); dragged.current = false; } }}
       onMouseEnter={stopAuto}
@@ -173,15 +175,34 @@ function SignatureRail() {
 
   return (
     <section className="sec" style={{ paddingTop: 0 }}><div className="wrap">
-      <div className="sec-head">
+      <div className="sec-head" data-reveal>
         <h2 className="display d2">{t('sigTitle')}</h2>
         <div className="rail-nav">
           <button type="button" aria-label={t('prev')} disabled={atStart} onClick={() => step(-1)}><Icon.chev d={-1} /></button>
           <button type="button" aria-label={t('next')} disabled={atEnd} onClick={() => step(1)}><Icon.chev d={1} /></button>
         </div>
       </div>
-      <div className="rail" ref={railRef}>{sig.map((p, i) => <ProductCard key={p.id} p={p} i={i} />)}</div>
+      <div className="rail" data-reveal style={iv(1)} ref={railRef}>{sig.map((p, i) => <ProductCard key={p.id} p={p} i={i} />)}</div>
     </div></section>
+  );
+}
+
+/** Pinned statement: the words light up one by one as you scroll through it. */
+function Manifesto() {
+  const { t } = useStore();
+  const words = t('manifesto').split(' ');
+  return (
+    <section className="mf" data-scene="pin" aria-label={t('storyEb')}>
+      <div className="mf-stage">
+        <Mono className="mf-mono" />
+        <div className="wrap mf-in">
+          <span className="label mf-eb">{t('storyEb')}</span>
+          <p className="mf-txt" style={{ '--n': words.length } as React.CSSProperties}>
+            {words.map((w, i) => <span key={i} style={iv(i)}>{w} </span>)}
+          </p>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -196,7 +217,7 @@ function Newsletter() {
     if (ok) setEmail('');
   };
   return (
-    <section className="letter"><div className="wrap in">
+    <section className="letter"><div className="wrap in" data-reveal>
       <div><h2>{t('letterTitle')}</h2><p>{t('letterSub')}</p></div>
       <div>
         <form className="lform" noValidate onSubmit={onSubmit}>
@@ -225,26 +246,28 @@ export function HomeView() {
       <HeroSlider />
 
       <section className="sec"><div className="wrap">
-        <div className="sec-head">
+        <div className="sec-head" data-reveal>
           <h2 className="display d2">{t('catTitle')}</h2>
           <button type="button" className="more label" onClick={() => act('all')}>{t('viewAllJ')} <Arrow /></button>
         </div>
-        <div className="tiles3">
-          {CATS.map(([k, id, skin]) => (
-            <button type="button" key={k} className={`t3 press ${skin}`} onClick={() => act('type:' + k)}>
+        <div className="tiles3" data-scene="view">
+          {CATS.map(([k, id, skin], i) => (
+            <button type="button" key={k} className={`t3 press ${skin}`} data-reveal style={iv(i)} onClick={() => act('type:' + k)}>
               <PieceSvg p={byId[id]} /><span className="display">{t(k)}</span><span className="go label">{t('discover')} <Arrow /></span>
             </button>
           ))}
         </div>
       </div></section>
 
-      <section className="sec" id="collections" style={{ paddingTop: 0 }}><div className="wrap">
-        <div className="sec-head"><div><h2 className="display d2">{t('colsTitle')}</h2><p>{t('colsSub')}</p></div></div>
-        <div className="ctiles">
-          {COL_KEYS.map((k) => {
+      <Manifesto />
+
+      <section className="sec" id="collections"><div className="wrap">
+        <div className="sec-head" data-reveal><div><h2 className="display d2">{t('colsTitle')}</h2><p>{t('colsSub')}</p></div></div>
+        <div className="ctiles" data-scene="view">
+          {COL_KEYS.map((k, i) => {
             const c = COLS[k];
             return (
-              <button type="button" key={k} className={`ctile press ${c.skin}`} onClick={() => act('col:' + k)}>
+              <button type="button" key={k} className={`ctile press ${c.skin}`} data-reveal style={iv(i)} onClick={() => act('col:' + k)}>
                 <span className="label">{L(c.stone)}</span>
                 <GemSvg cut={c.cut} color={c.gem} className="g" />
                 <span><span className="nm" style={{ display: 'block', marginBottom: 12 }}>{L(c.name)}</span><span className="go label">{t('discover')} <Arrow /></span></span>
@@ -255,11 +278,10 @@ export function HomeView() {
       </div></section>
 
       <section className="sec" id="story" style={{ paddingTop: 0 }}><div className="wrap split">
-        <div className="art art-story" aria-hidden="true"><Mono className="big" /><span className="sq"><Mono /></span></div>
-        <div className="txt">
+        <div className="art art-story" data-scene="view" aria-hidden="true"><Mono className="big" /><span className="sq"><Mono /></span></div>
+        <div className="txt" data-reveal>
           <span className="label">{t('ourStory')}</span>
           <h2 className="display d2">{t('aboutTitle')}</h2>
-          <blockquote>{t('manifesto')}</blockquote>
           <p>{t('aboutBody')}</p>
           <button type="button" className="btn btn-p label press" onClick={() => act('sec:collections')}>{t('storyBtn')} <Arrow /></button>
         </div>
@@ -268,7 +290,7 @@ export function HomeView() {
       <SignatureRail />
 
       <section className="sec" style={{ paddingTop: 0 }}><div className="wrap split rev">
-        <div className="art art-gift" aria-hidden="true">
+        <div className="art art-gift" data-scene="view" aria-hidden="true">
           <svg viewBox="0 0 200 220">
             <path d="M58 50 C40 120 30 170 46 196 Q100 214 154 196 C170 170 160 120 142 50 Z" fill="#12BDC1" />
             <path d="M58 50 Q100 64 142 50 L146 64 Q100 80 54 64 Z" fill="#0e9ea2" />
@@ -278,7 +300,7 @@ export function HomeView() {
           </svg>
           <Mono />
         </div>
-        <div className="txt">
+        <div className="txt" data-reveal>
           <span className="label">{t('giftEb')}</span>
           <h2 className="display d2">{t('giftTitle')}</h2>
           <p>{t('giftBody')}</p>
@@ -287,9 +309,9 @@ export function HomeView() {
       </div></section>
 
       <section className="sec" style={{ paddingTop: 0 }}><div className="wrap">
-        <div className="sec-head"><h2 className="display d2">{t('craftTitle')}</h2></div>
+        <div className="sec-head" data-reveal><h2 className="display d2">{t('craftTitle')}</h2></div>
         <div className="craft">
-          {t('craft').map((c, i) => { const I = craftIcons[i]; return <div key={c[0]}><I /><h3>{c[0]}</h3><p>{c[1]}</p></div>; })}
+          {t('craft').map((c, i) => { const I = craftIcons[i]; return <div key={c[0]} data-reveal style={iv(i)}><I /><h3>{c[0]}</h3><p>{c[1]}</p></div>; })}
         </div>
       </div></section>
 
